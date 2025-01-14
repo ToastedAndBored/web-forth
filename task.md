@@ -455,7 +455,7 @@ function highlight_color(index) {}
 
 Иначе элемент под соответствующим индексом в массиве маппингов обводится рамкой
 */
-function highlight_color(index) {}
+function highlight_border(index) {}
 
 /*
 Убирает любую подсветку у всех элементов
