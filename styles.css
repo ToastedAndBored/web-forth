@@ -32,6 +32,7 @@
   width : 30%;
   border: solid var(--border-c) 4px;
   color: var(--text-c);
+  white-space: pre;
 }
 
 body {
@@ -46,4 +47,14 @@ main {
 footer {
   display: flex;
   /* justify-content: space-between; */
+}
+
+.highlighted {
+  background-color: var(--highlight-c);
+  color: var(--background-c);
+}
+
+.err {
+  background-color: var(--err-c);
+  color: var(--background-c);
 }
