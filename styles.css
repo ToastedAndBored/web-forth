@@ -58,3 +58,9 @@ footer {
   background-color: var(--err-c);
   color: var(--background-c);
 }
+
+.halflight {
+  /* background-color: var(--highlight-c); */
+  opacity: 0.5;
+  /* color: var(--background-c); */
+}
