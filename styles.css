@@ -13,8 +13,14 @@
   height: 800px;
   width : 30%;
   border: solid var(--border-c)4px;
+  border-right: solid var(--border-c)5px;
   color: var(--text-c);
   float: left;
+  position: relative;
+  overflow: scroll;
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* display: flex; */
 }
 
 .stack_panel {
@@ -63,4 +69,39 @@ footer {
   /* background-color: var(--highlight-c); */
   opacity: 0.5;
   /* color: var(--background-c); */
+}
+
+.input {
+    position: absolute;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: monospace;
+
+    border: none;
+    border-color: transparent;
+    background-color: rgb(0, 0, 0);
+    width: 100%;
+    height: 100%;
+    resize: none;
+    overflow: scroll;
+    text-wrap: nowrap;
+    box-sizing:border-box;
+    margin: 0;
+    white-space: pre;
+}
+
+.words {
+  position: absolute;
+  z-index: 0;
+  text-wrap: nowrap;
+  white-space: pre;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.highlighted_border {
+  border: solid var(--text-c) 2px;
 }

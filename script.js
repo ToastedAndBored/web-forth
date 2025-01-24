@@ -49,11 +49,12 @@ class StackExplorer {
     this.#stackObj.prepend(span)
     this.#stackArr.unshift(span)
 
+    // FIX: Replace with addTextNode
     span.insertAdjacentHTML("afterbegin", `
       <span></span><span> ${value}</span><br>
       `
     )
-    this.fixNumbs()
+    this.fix_numbs()
 
     span.addEventListener("mouseenter", (event) => {
       this.#callback(value)
@@ -68,11 +69,11 @@ class StackExplorer {
     const value = this.#stack.shift()
     this.#stackObj.children[0].remove()
     this.#stackArr.shift()
-    this.fixNumbs()
+    this.fix_numbs()
     return value
   }
 
-  fixNumbs() {
+  fix_numbs() {
     for (var i in this.#stackArr) {
       this.#stackArr[i].children[0].textContent=`${i}`
     }
@@ -107,6 +108,8 @@ class Dictinary {
     span.setAttribute('class', "highlighted")
     this.#dictObj.prepend(span)
     this.#dictArr.unshift(span)
+
+    // FIX: Replace with addTextNode
     span.insertAdjacentHTML("afterbegin", `
       <span>${word} </span>
       <span>${typeof definition === "function" ? "builtIn:" : definition} </span>
@@ -158,11 +161,83 @@ class Dictinary {
 
 }
 
+
+const show_input = () => {
+  const input = document.querySelector('.input')
+  const words = document.querySelector('.words')
+  input.setAttribute("style", "visibility: visible")
+  words.setAttribute("style", "visibility: collapse;")
+}
+
+const show_words = () => {
+  const input = document.querySelector('.input')
+  const words = document.querySelector('.words')
+  input.setAttribute("style", "visibility: collapse;")
+  words.setAttribute("style", "visibility: visible;")
+}
+
+class ShowWords {
+  #text= []
+  #textObj
+  #textArr = []
+  #highlightedColor = null
+  #highlightedBorder = null
+  #callback = () => {}
+
+  constructor(textObj,callback) {
+    this.#textObj = textObj
+    this.#callback = callback
+  }
+
+  add(text, indexable) {
+    const span = document.createElement('span')
+    const t = document.createTextNode(text)
+    span.appendChild(t)
+    this.#textObj.appendChild(span)
+    this.#textArr.push(span)
+    if (indexable) {
+      this.#text.push(span)
+    }
+  }
+
+  highlight_color(index) {
+    if (this.#highlightedColor !== null) {
+      this.#highlightedColor.classList.remove('highlighted')
+    }
+    if (index !== null) {
+      this.#text[index].classList.add('highlighted')
+      this.#highlightedColor = this.#text[index]
+    }
+  }
+
+  highlight_border(index) {
+    if (this.#highlightedBorder !== null) {
+      this.#highlightedBorder.classList.remove('highlighted_border')
+    }
+    if (index !== null) {
+      this.#text[index].classList.add('highlighted_border')
+      this.#highlightedBorder = this.#text[index]
+    }
+  }
+
+  unhighlight() {
+    this.highlight_color(null)
+    this.highlight_border(null)
+  }
+
+}
+
+const parser = (text) => {
+
+}
+
 let outp = new Output()
 
 const leftStackObj = document.querySelector('#left_stack')
 let leftStack = new StackExplorer(leftStackObj, console.log)
 const dictObj = document.querySelector('#dictionary')
 const dictionary = new Dictinary(dictObj, console.log())
+const wordsObj = document.querySelector(".words")
+const words = new ShowWords(wordsObj,console.log())
 
 outp.print('asdsadada')
