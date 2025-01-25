@@ -227,6 +227,48 @@ class ShowWords {
 
 }
 
+/*
+'aaaaaa bbb c\n\nd e\\ \' ffffffff'
+*/
+/*
+aaaaaa bbb c
+
+d e\ ' ffffffff
+*/
+const unescape = (text) => {
+  let result = ""
+  let i = 0
+
+  if (text[0] === "\'" && text[text.length-1] === "\'") {
+    text = text.slice(1,-1)
+  }else {
+    return text
+  }
+
+  while (i < text.length){
+    const a = text[i]
+    const b = text.length === i ? "" : text[i+1]
+    if (a === "\\" && b === "\\") {
+      result += a
+      i += 2
+      continue
+    }
+    if (a === "\\" && b === '\'') {
+      result += b
+      i += 2
+      continue
+    }
+    if (a === "\\" && b === "n") {
+      result += '\n'
+      i += 2
+      continue
+    }
+    result += a
+    i += 1
+  }
+  return result
+}
+
 const parser = (text) => {
 
 }

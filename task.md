@@ -95,7 +95,7 @@ m       n    145
 	{"origin": "e", "value": "e", "postfix": "\n"},
 	{"origin": "f", "value": "f", "postfix": " "},
 	{"origin": "g", "value": "g", "postfix": " "},
-	{"origin": "'a \\n \\n bb'", "text": "a \n \n bb", "postfix": "\n", "quotted": true},
+	{"origin": "'a \\n \\n bb'", "value": "a \n \n bb", "postfix": "\n", "quotted": true},
 	{"origin": "hjk", "value": "hjk", "postfix": " "},
 	{"origin": "l", "value": "l", "postfix": "\n\n\n"},
 	{"origin": "m", "value": "m", "postfix": "       "},
