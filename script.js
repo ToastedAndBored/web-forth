@@ -269,8 +269,56 @@ const unescape = (text) => {
   return result
 }
 
-const parser = (text) => {
+const isSpace = (text) => {
+  if (text === "\n") {
+    return true
+  }
+  if (text === " "){
+    return true
+  }
+  return false
+}
 
+const parser = (text) => {
+  let result = []
+  const space = 1
+  const sWord = 2
+  const cWord = 3
+  let state = space
+  let acc = {'origin': "", 'value': ""}
+  let i = 0
+  while (i < text.length) {
+    if (state === sWord) {
+      // 2 -> 1
+      if (isSpace(text[i])) {
+        result.push(acc)
+        state = space
+        i += 1
+        continue
+      }
+      // 2 -> 2
+      acc.origin += text[i]
+      i += 1
+    }
+    if (state === space) {
+      // 1 -> 2
+      if (!isSpace(text[i])) {
+        acc = {'origin': "",'value': ""}
+        state = sWord
+        continue
+      }
+      // 1 -> 1
+      i += 1
+    }
+  }
+  if (state === sWord || state === cWord) {
+    if (state === cWord) {
+      acc.value = unescape(acc.origin)
+    }
+    result.push(acc)
+
+  }
+  return result
 }
 
 let outp = new Output()
