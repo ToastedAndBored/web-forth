@@ -286,11 +286,20 @@ const parser = (text) => {
   const cWord = 3
   let state = space
   let acc = {'origin': "", 'value': ""}
+  let cW = ""
+  let slash
+  let fix = ""
   let i = 0
   while (i < text.length) {
     if (state === sWord) {
       // 2 -> 1
       if (isSpace(text[i])) {
+        fix = text[i]
+        if (/^\d+$/.test(acc.origin)) {
+          acc.value = parseInt(acc.origin)
+        } else {
+          acc.value = acc.origin
+        }
         result.push(acc)
         state = space
         i += 1
@@ -304,19 +313,56 @@ const parser = (text) => {
       // 1 -> 2
       if (!isSpace(text[i])) {
         acc = {'origin': "",'value': ""}
-        state = sWord
+        if (fix != "") {
+         if (result.length == 0) {
+           acc.prefix = fix
+         } else {
+           result[result.length-1].postfix = fix
+         }
+        }
+        if (text[i] === "\'") {
+          // 1 -> 3
+          state = cWord
+          cW += text[i]
+          i += 1
+        }else {
+          // 1 -> 2
+          state = sWord
+        }
         continue
       }
       // 1 -> 1
+      fix += text[i]
+      i += 1
+    }
+    if (state === cWord) {
+      //3 -> 1
+      if (text[i] === "\'" && !slash) {
+        fix = ""
+        cW += text[i]
+        result.push({'origin': cW,'value': unescape(cW)})
+        cW = ""
+        state = space
+        i += 1
+        continue
+      }
+      //3 -> 3
+      if (text[i] === "\\" && !slash ) {
+        slash = true
+      } else {
+        slash = false
+      }
+      cW += text[i]
       i += 1
     }
   }
   if (state === sWord || state === cWord) {
     if (state === cWord) {
       acc.value = unescape(acc.origin)
+    } else if (/^\d+$/.test(acc.origin)){
+      acc.value = parseInt(acc.origin)
     }
     result.push(acc)
-
   }
   return result
 }
