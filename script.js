@@ -152,6 +152,7 @@ class Dictinary {
         return this.#dictionary[i].def
       }
     }
+    return null
   }
 
   unhighlight() {
@@ -340,7 +341,7 @@ const parser = (text) => {
       if (text[i] === "\'" && !slash) {
         fix = ""
         cW += text[i]
-        result.push({'origin': cW,'value': unescape(cW)})
+        result.push({'origin': cW,'value': unescape(cW), 'quotted': true})
         cW = ""
         state = space
         i += 1
@@ -367,13 +368,79 @@ const parser = (text) => {
   return result
 }
 
-let outp = new Output()
+class Interpretor {
+  #program
+  #output
+  #leftStack
+  #rightStack
+  #dictionary
+  #word
+  wp = 0
+  working = true
+
+  constructor (program,output,leftStack,rightStack,dictionary) {
+    this.#program = program
+    this.#output = output
+    this.#leftStack = leftStack
+    this.#rightStack = rightStack
+    this.#dictionary = dictionary
+    console.log(this.#program)
+  }
+
+  step () {
+    if (this.working == false) {
+      return this.working
+    }
+
+    if (typeof this.wp != "number" || this.wp < 0 || this.wp >= this.#program.length) {
+      this.working = false
+      throw new Error ('Wrong WP')
+    }
+    let word = this.#program[this.wp]
+    let def = this.#dictionary.resolve(word.value)
+
+    if (def == null || typeof def == "number" || word.quotted ) {
+      this.#leftStack.push(word.value)
+      this.wp += 1
+      if (this.wp >= this.#program.length) {
+        this.working = false
+      }
+      return this.working
+    }
+
+    let oldWp = this.wp
+
+    if (typeof def == "function") {
+      def()
+      if (this.wp == oldWp) {
+        this.wp += 1
+      }
+      if (this.wp >= this.#program.length) {
+        this.working = false
+      }
+      return this.working
+    }
+    console.log(wp)
+
+    this.wp = def
+    return this.working
+  }
+}
+
+let output = new Output()
 
 const leftStackObj = document.querySelector('#left_stack')
 let leftStack = new StackExplorer(leftStackObj, console.log)
+
+const rightStackObj = document.querySelector('#right_stack')
+let rightStack = new StackExplorer(rightStackObj, console.log)
+
 const dictObj = document.querySelector('#dictionary')
 const dictionary = new Dictinary(dictObj, console.log())
+
 const wordsObj = document.querySelector(".words")
 const words = new ShowWords(wordsObj,console.log())
 
-outp.print('asdsadada')
+const interpretor = new Interpretor(parser(document.querySelector(".input").value),output,leftStack,rightStack,dictionary)
+console.log(interpretor.wp)
+output.print('asdsadada')
