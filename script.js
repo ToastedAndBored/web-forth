@@ -1,21 +1,24 @@
 
 class Output {
   #outputArr = []
+  #outputObj
+
+  constructor (outputObj) {
+    this.#outputObj = outputObj
+  }
 
   print(text) {
-    const output = document.querySelector('.output')
     const span = document.createElement('span')
     span.setAttribute('class', "highlighted")
     const t = document.createTextNode(text)
     span.appendChild(t)
-    output.appendChild(span)
+    this.#outputObj.appendChild(span)
     this.#outputArr.push(span)
 
   }
 
   error(text) {
-    const output = document.querySelector('.output')
-    output.insertAdjacentHTML("beforeend", `
+    this.#outputObj.insertAdjacentHTML("beforeend", `
       <span class = "err">${text}</span>
       `
     )
@@ -205,20 +208,24 @@ class ShowWords {
     if (this.#highlightedColor !== null) {
       this.#highlightedColor.classList.remove('highlighted')
     }
-    if (index !== null) {
-      this.#text[index].classList.add('highlighted')
-      this.#highlightedColor = this.#text[index]
-    }
+    if (index == null) {return}
+    if (typeof index != "number") {return}
+    if (index < 0) {return}
+    if (index >= this.#text.length) {return}
+    this.#text[index].classList.add('highlighted')
+    this.#highlightedColor = this.#text[index]
   }
 
   highlight_border(index) {
     if (this.#highlightedBorder !== null) {
       this.#highlightedBorder.classList.remove('highlighted_border')
     }
-    if (index !== null) {
-      this.#text[index].classList.add('highlighted_border')
-      this.#highlightedBorder = this.#text[index]
-    }
+    if (index == null) {return}
+    if (typeof index != "number") {return}
+    if (index < 0) {return}
+    if (index >= this.#text.length) {return}
+    this.#text[index].classList.add('highlighted_border')
+    this.#highlightedBorder = this.#text[index]
   }
 
   unhighlight() {
@@ -384,7 +391,7 @@ class Interpretor {
     this.#leftStack = leftStack
     this.#rightStack = rightStack
     this.#dictionary = dictionary
-    console.log(this.#program)
+    // console.log(this.#program)
   }
 
   step () {
@@ -427,20 +434,223 @@ class Interpretor {
   }
 }
 
-let output = new Output()
+// let output = new Output(document.querySelector('.output'))
 
-const leftStackObj = document.querySelector('#left_stack')
-let leftStack = new StackExplorer(leftStackObj, console.log)
+// const leftStackObj = document.querySelector('#left_stack')
+// let leftStack = new StackExplorer(leftStackObj, console.log)
 
-const rightStackObj = document.querySelector('#right_stack')
-let rightStack = new StackExplorer(rightStackObj, console.log)
+// const rightStackObj = document.querySelector('#right_stack')
+// let rightStack = new StackExplorer(rightStackObj, console.log)
 
-const dictObj = document.querySelector('#dictionary')
-const dictionary = new Dictinary(dictObj, console.log())
+// const dictObj = document.querySelector('#dictionary')
+// const dictionary = new Dictinary(dictObj, console.log())
 
-const wordsObj = document.querySelector(".words")
-const words = new ShowWords(wordsObj,console.log())
+// const wordsObj = document.querySelector(".words")
+// const words = new ShowWords(wordsObj,console.log())
 
-const interpretor = new Interpretor(parser(document.querySelector(".input").value),output,leftStack,rightStack,dictionary)
-console.log(interpretor.wp)
-output.print('asdsadada')
+// const interpretor = new Interpretor(parser(document.querySelector(".input").value),output,leftStack,rightStack,dictionary)
+// console.log(interpretor.wp)
+// output.print('asdsadada')
+
+class ExecutionInterface {
+
+  #buttonStart //querySelector('.start')
+  #buttonNext //querySelector('.next_step')
+  #buttonStop //querySelector('.stop')
+  #labelStep //querySelector('.steps')
+  #labelWords //querySelector('.wordsL')
+  #widgetLeftStack //querySelector('#left_stack')
+  #widgetRightStack //querySelector('#right_stack')
+  #widgetDictionary //querySelector('#dictionary')
+  #widgetWords // querySelector('.words')
+  #widgetOutput //querySelector('.output')
+  #input //querySelector('textarea')
+  #steps // counter of steps
+  #words //object of ShowWords
+  #leftStack //object of StackExplorer
+  #rightStack //object of StackExplorer
+  #dictionary // object of Dictinary
+  #program // parsed input.value
+  #interpretor // object of Interpretor
+  #output //object of Output
+
+
+  constructor (buttonStart,buttonStop,buttonNext,labelStep,labelWords,
+    widgetLeftStack,widgetRightStack,widgetDictionary,widgetWords,widgetOutput,
+    input) {
+
+    this.#buttonStart = buttonStart
+    this.#buttonStop = buttonStop
+    this.#buttonNext = buttonNext
+    this.#labelStep = labelStep
+    this.#labelWords = labelWords
+    this.#widgetLeftStack = widgetLeftStack
+    this.#widgetRightStack = widgetRightStack
+    this.#widgetDictionary = widgetDictionary
+    this.#widgetWords = widgetWords
+    this.#input = input
+    this.#widgetOutput = widgetOutput
+
+    this.#buttonStart.addEventListener("click", (event) => {
+      this.on_start()
+    })
+
+    this.#buttonNext.addEventListener('click', (event) => {
+      this.on_next()
+    })
+
+    this.#buttonStop.addEventListener('click', (event) => {
+      this.on_reset()
+    })
+
+    this.#input.addEventListener('input', (event) => {
+      this.on_code_change()
+    })
+
+    this.init()
+  }
+
+  init() {
+    this.#words = new ShowWords(this.#widgetWords, console.log)
+
+    this.#leftStack = new StackExplorer(this.#widgetLeftStack,(n) => {this.#words.highlight_border(n)})
+    this.#rightStack = new StackExplorer(this.#widgetRightStack,(n) => {this.#words.highlight_border(n)})
+
+    this.#dictionary = new Dictinary(this.#widgetDictionary,(n) => {this.#words.highlight_border(n)})
+
+    this.#output = new Output(this.#widgetOutput)
+
+    this.bind_builtin_words()
+    this.on_code_change()
+    show_input()
+  }
+
+  bind_builtin_words () {
+
+  }
+
+  unhighlight () {
+    this.#leftStack.unhighlight()
+    this.#rightStack.unhighlight()
+    this.#dictionary.unhighlight()
+    this.#words.unhighlight()
+    this.#output.unhighlight()
+  }
+
+  on_error (err) {
+
+    if (this.#interpretor) {
+      this.#interpretor.working = false
+    }
+    this.#buttonNext.disabled = true
+
+    this.#output.error(err.message)
+
+  }
+
+  on_start () {
+    console.log("Start clicked")
+    try {
+      this.#buttonStart.disabled = true
+      this.#buttonNext.disabled = false
+      this.#buttonStop.disabled = false
+
+      this.#steps = 0
+
+      this.#labelStep.innerHTML = `${this.#steps}`
+
+      for (var i in this.#program) {
+        const element = this.#program[i]
+
+        if (element.prefix) {
+         this.#words.add(element.prefix,false)
+        }
+
+        this.#words.add(element.origin,true)
+
+        if (element.postfix) {
+          this.#words.add(element.postfix,false)
+        }
+      }
+      show_words()
+
+      this.#interpretor = new Interpretor(this.#program,this.#output,
+        this.#leftStack,this.#rightStack,this.#dictionary)
+    } catch (error) {
+      this.on_error(error)
+      throw error
+    }
+
+  }
+
+  on_next () {
+    console.log("Next clicked")
+    try {
+
+      this.unhighlight()
+
+      this.#words.highlight_color(this.#interpretor.wp)
+      const step = this.#interpretor.step()
+
+      if (!step) {
+        this.#buttonNext.disabled = true
+        this.#output.print('\nFINISHED')
+      }
+
+      this.#steps += 1
+
+      this.#labelStep.innerHTML = `${this.#steps}`
+    } catch (error) {
+      this.on_error(error)
+      throw error
+    }
+  }
+
+  on_reset () {
+    console.log("Reset clicked")
+
+    show_input()
+
+    this.#widgetWords.replaceChildren()
+    this.#widgetLeftStack.replaceChildren()
+    this.#widgetRightStack.replaceChildren()
+    this.#widgetDictionary.replaceChildren()
+    this.#widgetOutput.replaceChildren()
+
+    this.#buttonNext.disabled = true
+    this.#buttonStop.disabled = true
+    this.#buttonStart.disabled = true
+
+    this.init()
+  }
+
+  on_code_change () {
+
+    const text = this.#input.value
+    this.#program = parser(text)
+
+    this.#labelWords.innerHTML = `${this.#program.length}`
+
+    if (this.#program.length > 0) {
+      this.#buttonStart.disabled = false
+    }else {
+      this.#buttonStart.disabled = true
+    }
+  }
+
+}
+
+new ExecutionInterface(
+  document.querySelector('.start'),
+  document.querySelector('.stop'),
+  document.querySelector('.next_step'),
+  document.querySelector('.steps'),
+  document.querySelector('.wordsL'),
+  document.querySelector('#left_stack'),
+  document.querySelector('#right_stack'),
+  document.querySelector('#dictionary'),
+  document.querySelector('.words'),
+  document.querySelector('.output'),
+  document.querySelector('.input'),
+)
+
