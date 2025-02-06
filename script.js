@@ -48,15 +48,19 @@ class StackExplorer {
   push(value) {
     this.#stack.unshift(value)
     const span = document.createElement('span')
+    const span2 = document.createElement('span')
+    const span3 = document.createElement('span')
+    const br = document.createElement('br')
     span.setAttribute('class', "highlighted")
     this.#stackObj.prepend(span)
     this.#stackArr.unshift(span)
 
-    // FIX: Replace with addTextNode
-    span.insertAdjacentHTML("afterbegin", `
-      <span></span><span> ${value}</span><br>
-      `
-    )
+    const t = document.createTextNode(value)
+    span3.appendChild(t)
+    span.appendChild(span2)
+    span2.setAttribute('style','padding: 5px;')
+    span.appendChild(span3)
+    span.appendChild(br)
     this.fix_numbs()
 
     span.addEventListener("mouseenter", (event) => {
@@ -112,13 +116,23 @@ class Dictinary {
     this.#dictObj.prepend(span)
     this.#dictArr.unshift(span)
 
-    // FIX: Replace with addTextNode
-    span.insertAdjacentHTML("afterbegin", `
-      <span>${word} </span>
-      <span>${typeof definition === "function" ? "builtIn:" : definition} </span>
-      <span>${comment}</span><br>
-      `
-    )
+    const tWord = document.createTextNode(word)
+    const tDef = document.createTextNode(typeof definition === "function" ? "builtIn:" : definition)
+    const tComment = document.createTextNode(comment)
+    const spanWord = document.createElement('span')
+    const spanDef = document.createElement('span')
+    const spanComment = document.createElement('span')
+    const br = document.createElement('br')
+
+    span.appendChild(spanWord)
+    spanWord.appendChild(tWord)
+    span.appendChild(spanDef)
+    spanDef.appendChild(tDef)
+    span.appendChild(spanComment)
+    if (comment) {
+      spanComment.appendChild(tComment)
+    }
+    span.appendChild(br)
     this.fixlight(true)
   }
 
@@ -364,11 +378,16 @@ const parser = (text) => {
       i += 1
     }
   }
-  if (state === sWord || state === cWord) {
-    if (state === cWord) {
-      acc.value = unescape(acc.origin)
-    } else if (/^\d+$/.test(acc.origin)){
+  // 3 -> END
+  if (state === cWord) {
+    result.push({'origin': cW,'value': unescape(cW), 'quotted': true})
+  }
+  // 2 -> END
+  if (state === sWord) {
+    if (/^\d+$/.test(acc.origin)){
       acc.value = parseInt(acc.origin)
+    } else {
+      acc.value = acc.origin
     }
     result.push(acc)
   }
@@ -406,7 +425,8 @@ class Interpretor {
     let word = this.#program[this.wp]
     let def = this.#dictionary.resolve(word.value)
 
-    if (def == null || typeof def == "number" || word.quotted ) {
+    if (def == null || typeof word.value == "number" || word.quotted ) {
+      // console.log(word,this.wp)
       this.#leftStack.push(word.value)
       this.wp += 1
       if (this.wp >= this.#program.length) {
@@ -416,10 +436,12 @@ class Interpretor {
     }
 
     let oldWp = this.wp
+    // console.log(wp)
 
     if (typeof def == "function") {
-      def()
-      if (this.wp == oldWp) {
+      const shouldNOTInc = def()
+     // console.log(def())
+      if (!shouldNOTInc && oldWp == this.wp) {
         this.wp += 1
       }
       if (this.wp >= this.#program.length) {
@@ -427,8 +449,9 @@ class Interpretor {
       }
       return this.working
     }
-    console.log(wp)
+    // console.log(this.wp)
 
+    this.#rightStack.push(this.wp+1)
     this.wp = def
     return this.working
   }
@@ -527,6 +550,150 @@ class ExecutionInterface {
 
   bind_builtin_words () {
 
+    this.#dictionary.define("+", () => {
+      this.#leftStack.push(this.#leftStack.pop() + this.#leftStack.pop())
+    }, "Summ")
+
+    this.#dictionary.define("-", () => {
+      this.#leftStack.push(this.#leftStack.pop() - this.#leftStack.pop())
+    }, "Minus")
+
+    this.#dictionary.define("*", () => {
+      this.#leftStack.push(this.#leftStack.pop() * this.#leftStack.pop())
+    }, "Mult")
+
+    this.#dictionary.define("/", () => {
+      this.#leftStack.push(this.#leftStack.pop() / this.#leftStack.pop())
+    }, "Div")
+
+    this.#dictionary.define("//", () => {
+      this.#leftStack.push(Math.floor(this.#leftStack.pop() / this.#leftStack.pop()))
+    }, "DivInt")
+
+    this.#dictionary.define("/.", () => {
+      this.#leftStack.push(this.#leftStack.pop() % this.#leftStack.pop())
+    }, "Rem")
+
+    this.#dictionary.define("=", () => {
+      this.#leftStack.push(this.#leftStack.pop() == this.#leftStack.pop())
+    }, "Eqv")
+
+    this.#dictionary.define(">", () => {
+      this.#leftStack.push(this.#leftStack.pop() > this.#leftStack.pop())
+    }, "More")
+
+    this.#dictionary.define("<", () => {
+      this.#leftStack.push(this.#leftStack.pop() < this.#leftStack.pop())
+    }, "Less")
+
+    this.#dictionary.define(".", () => {
+      this.#interpretor.working = false
+    }, "Finish program")
+
+    this.#dictionary.define("..", () => {
+      this.#output.print(this.#leftStack.pop())
+    }, "Print")
+
+    this.#dictionary.define("[", () => {
+      let val = this.#leftStack.pop()
+      this.#leftStack.push(val)
+      this.#leftStack.push(val)
+    }, "Dup")
+
+    this.#dictionary.define("]", () => {
+      this.#leftStack.pop()
+    }, "Drop")
+
+    this.#dictionary.define("][", () => {
+      const first = this.#leftStack.pop()
+      const second = this.#leftStack.pop()
+      this.#leftStack.push(first)
+      this.#leftStack.push(second)
+    }, "Swap")
+
+    this.#dictionary.define("->", () => {
+      this.#rightStack.push(this.#leftStack.pop())
+    }, "LtR")
+
+    this.#dictionary.define("<-", () => {
+      this.#leftStack.push(this.#rightStack.pop())
+    }, "RtL")
+
+    this.#dictionary.define("^", () => {
+      this.#interpretor.wp = this.#rightStack.pop()
+      return true
+    }, "GoTo")
+
+    this.#dictionary.define("^^", () => {
+      let dst = this.#rightStack.pop()
+      this.#rightStack.push(this.#interpretor.wp+1)
+      this.#interpretor.wp = dst
+      return true
+    }, "Call")
+
+    this.#dictionary.define(";", () => {
+      this.#interpretor.wp = this.#rightStack.pop()
+      return true
+    }, "BlockEnd")
+
+    this.#dictionary.define(";;", () => {
+      this.#interpretor.wp += 2
+    }, "Skip")
+
+    this.#dictionary.define(":", () => {
+      let counter = 1
+      this.#interpretor.wp += 1
+      this.#rightStack.push(this.#interpretor.wp)
+      while ((this.#interpretor.wp < this.#program.length) && counter > 0) {
+        if (this.#program[this.#interpretor.wp].value == ";") {
+          counter -= 1
+        }
+        if (this.#program[this.#interpretor.wp].value == ":") {
+          counter += 1
+        }
+        this.#interpretor.wp += 1
+      }
+    }, "GoTo")
+
+    this.#dictionary.define("@", () => {
+      this.#dictionary.define(this.#leftStack.pop(),this.#rightStack.pop())
+    }, "Define")
+
+    this.#dictionary.define("!@", () => {
+      this.#dictionary.undefine(this.#leftStack.pop())
+    }, "Undefine")
+
+    this.#dictionary.define("~", () => {
+      this.#rightStack.push(this.#dictionary.resolve(this.#leftStack.pop()))
+    }, "Resolve")
+
+    this.#dictionary.define(",", () => {
+      this.#rightStack.push(this.#interpretor.wp)
+    }, "Label")
+
+    this.#dictionary.define("!", () => {
+      this.#leftStack.push(!this.#leftStack.pop())
+    }, "Not")
+
+    this.#dictionary.define('"', () => {
+      this.#leftStack.push(this.#program[this.#interpretor.wp+1])
+      this.#interpretor.wp += 2
+    }, "Push")
+
+    this.#dictionary.define("?", () => {
+      const first = this.#rightStack.pop()
+      const second = this.#rightStack.pop()
+      const condition = this.#leftStack.pop()
+      this.#rightStack.push(this.#interpretor.wp + 1)
+      if (condition) {
+        this.#interpretor.wp = first
+      } else {
+        this.#interpretor.wp = second
+      }
+      return true
+    }, "If")
+
+    this.#dictionary.unhighlight()
   }
 
   unhighlight () {
