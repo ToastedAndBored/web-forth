@@ -12,11 +12,30 @@
     </header>
     <main>
       <div class = "code_panel">
-        <textarea class = "input" autocorrect="off" autocapitalize="off" spellcheck="false">: .. '\n' .. ; .n @
-: , <- <- [ -> -> ->
-[ .n 1
-][ - [ 1 > ! ? ; loop @
-100 loop </textarea>
+        <textarea class = "input" autocorrect="off" autocapitalize="off" spellcheck="false">:
+ -> ][ <-
+ + 2 ][ / ->
+ + 2 ][ / <-
+; |> @
+: [ -> -> [ <- ][ <- ; [2 @
+:
+  -> -> -> ][ -> ][ <-
+  <- ][ -> ][ <-
+  <- ][ -> ][ <-
+  <- ][ -> ][ <-
+; 2-3> @
+:
+ 2-3>
+ 3 0 <> 1 ][ // 0 =
+ '<3>' ~
+ ! , <- 9 + <- ][ -> -> ?
+; <3> @
+
+0 0 [2 (>) 10 (.)
+(w) 0 [2 (>) 10 (.)
+2 (w) / (h) [2 (>) 10 (.)
+
+, <3> [2 (^) |> (>) 3 (.) ^</textarea>
         <div class = "words"></div>
       </div>
       <div class = "stack_panel">
@@ -39,9 +58,11 @@
       <button type="" class = "start">Start</button>
       <button type="" class = "stop">Stop</button>
       <button type="" class = "next_step">Next step</button>
+      <button type="" id = "run">Run</button>
       <label for="" class = "steps"></label>
       <label for="" class = "wordsL"></label>
     </footer>
+    <canvas id="canv" style="background-color: white;"></canvas>
   <script src='./script.js'></script>
   </body>
 </html>

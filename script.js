@@ -1,4 +1,3 @@
-
 class Output {
   #outputArr = []
   #outputObj
@@ -30,6 +29,43 @@ class Output {
     }
   }
 
+}
+
+class OutpCanv {
+  #CX = 0
+  #CY = 0
+  #canv
+  #cont
+  constructor(canvObj) {
+    this.#canv = canvObj
+    this.#cont = canvObj.getContext("2d")
+    this.#cont.beginPath()
+    this.#cont.clearRect(0, 0, this.#canv.width, this.#canv.height);
+  }
+  getPosXY() {
+    return [this.#CX, this.#CY]
+  }
+  getDim() {
+    return [this.#canv.width, this.#canv.height]
+  }
+  setPosXY(x, y) {
+    this.#CX = x
+    this.#CY = y
+  }
+  lineToXY(x, y) {
+    this.#cont.beginPath()
+    this.#cont.moveTo(this.#CX, this.#CY)
+    this.#cont.lineTo(x, y)
+    this.#cont.stroke()
+    this.#CX = x
+    this.#CY = y
+  }
+  dot(r) {
+    this.#cont.beginPath()
+    this.#cont.moveTo(this.#CX, this.#CY)
+    this.#cont.roundRect(this.#CX-(r/2), this.#CY-(r/2), r, r, r)
+    this.#cont.fill()
+  }
 }
 
 class StackExplorer {
@@ -457,28 +493,11 @@ class Interpretor {
   }
 }
 
-// let output = new Output(document.querySelector('.output'))
-
-// const leftStackObj = document.querySelector('#left_stack')
-// let leftStack = new StackExplorer(leftStackObj, console.log)
-
-// const rightStackObj = document.querySelector('#right_stack')
-// let rightStack = new StackExplorer(rightStackObj, console.log)
-
-// const dictObj = document.querySelector('#dictionary')
-// const dictionary = new Dictinary(dictObj, console.log())
-
-// const wordsObj = document.querySelector(".words")
-// const words = new ShowWords(wordsObj,console.log())
-
-// const interpretor = new Interpretor(parser(document.querySelector(".input").value),output,leftStack,rightStack,dictionary)
-// console.log(interpretor.wp)
-// output.print('asdsadada')
-
 class ExecutionInterface {
 
   #buttonStart //querySelector('.start')
   #buttonNext //querySelector('.next_step')
+  #buttonRun
   #buttonStop //querySelector('.stop')
   #labelStep //querySelector('.steps')
   #labelWords //querySelector('.wordsL')
@@ -487,6 +506,7 @@ class ExecutionInterface {
   #widgetDictionary //querySelector('#dictionary')
   #widgetWords // querySelector('.words')
   #widgetOutput //querySelector('.output')
+  #widgetOutpCanv //querySelector('#canv')
   #input //querySelector('textarea')
   #steps // counter of steps
   #words //object of ShowWords
@@ -496,15 +516,21 @@ class ExecutionInterface {
   #program // parsed input.value
   #interpretor // object of Interpretor
   #output //object of Output
+  #outpCanv
 
 
-  constructor (buttonStart,buttonStop,buttonNext,labelStep,labelWords,
-    widgetLeftStack,widgetRightStack,widgetDictionary,widgetWords,widgetOutput,
-    input) {
+  constructor (
+    buttonStart,buttonStop,buttonNext,buttonRun,
+    labelStep,labelWords,
+    widgetLeftStack,widgetRightStack,widgetDictionary,
+    widgetWords,widgetOutput,widgetOutpCanv,
+    input
+  ) {
 
     this.#buttonStart = buttonStart
     this.#buttonStop = buttonStop
     this.#buttonNext = buttonNext
+    this.#buttonRun = buttonRun
     this.#labelStep = labelStep
     this.#labelWords = labelWords
     this.#widgetLeftStack = widgetLeftStack
@@ -513,6 +539,7 @@ class ExecutionInterface {
     this.#widgetWords = widgetWords
     this.#input = input
     this.#widgetOutput = widgetOutput
+    this.#widgetOutpCanv = widgetOutpCanv
 
     this.#buttonStart.addEventListener("click", (event) => {
       this.on_start()
@@ -524,6 +551,10 @@ class ExecutionInterface {
 
     this.#buttonStop.addEventListener('click', (event) => {
       this.on_reset()
+    })
+
+    this.#buttonRun.addEventListener('click', (event) => {
+      this.on_tick()
     })
 
     this.#input.addEventListener('input', (event) => {
@@ -542,6 +573,7 @@ class ExecutionInterface {
     this.#dictionary = new Dictinary(this.#widgetDictionary,(n) => {this.#words.highlight_border(n)})
 
     this.#output = new Output(this.#widgetOutput)
+    this.#outpCanv = new OutpCanv(this.#widgetOutpCanv)
 
     this.bind_builtin_words()
     this.on_code_change()
@@ -693,6 +725,48 @@ class ExecutionInterface {
       return true
     }, "If")
 
+    this.#dictionary.define("NOP", () => {}, "Nop")
+
+    this.#dictionary.define("<>", () => {
+      const min = this.#leftStack.pop()
+      const max = this.#leftStack.pop()
+      const rand = Math.random() * (max - min) + min
+      this.#leftStack.push(rand)
+    }, "Random")
+
+    this.#dictionary.define("(w)", () => {
+      const [w, h] = this.#outpCanv.getDim()
+      this.#leftStack.push(w)
+    }, "Canvas width")
+
+    this.#dictionary.define("(h)", () => {
+      const [w, h] = this.#outpCanv.getDim()
+      this.#leftStack.push(h)
+    }, "Canvas height")
+
+    this.#dictionary.define("(>)", () => {
+      const h = this.#leftStack.pop()
+      const w = this.#leftStack.pop()
+      this.#outpCanv.setPosXY(w, h)
+    }, "Move to")
+
+    this.#dictionary.define("(>>)", () => {
+      const h = this.#leftStack.pop()
+      const w = this.#leftStack.pop()
+      this.#outpCanv.lineToXY(w, h)
+    }, "Line to")
+
+    this.#dictionary.define("(.)", () => {
+      const r = this.#leftStack.pop()
+      this.#outpCanv.dot(r)
+    }, "Dot")
+
+    this.#dictionary.define("(^)", () => {
+      const [x, y] = this.#outpCanv.getPosXY()
+      this.#leftStack.push(x)
+      this.#leftStack.push(y)
+    }, "Get position")
+
     this.#dictionary.unhighlight()
   }
 
@@ -805,12 +879,21 @@ class ExecutionInterface {
     }
   }
 
+  on_tick() {
+    for (let step = 0; step < 20; step++) {
+      // FIX:Error when on_stop clicked while tick running
+      this.on_next()
+      if (!this.#interpretor.working) { return }
+    }
+    setTimeout(() => { this.on_tick() } , 0);
+  }
 }
 
-new ExecutionInterface(
+const EI = new ExecutionInterface(
   document.querySelector('.start'),
   document.querySelector('.stop'),
   document.querySelector('.next_step'),
+  document.querySelector('#run'),
   document.querySelector('.steps'),
   document.querySelector('.wordsL'),
   document.querySelector('#left_stack'),
@@ -818,6 +901,7 @@ new ExecutionInterface(
   document.querySelector('#dictionary'),
   document.querySelector('.words'),
   document.querySelector('.output'),
+  document.querySelector('#canv'),
   document.querySelector('.input'),
 )
 
