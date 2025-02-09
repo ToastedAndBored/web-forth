@@ -39,6 +39,8 @@ class OutpCanv {
   constructor(canvObj) {
     this.#canv = canvObj
     this.#cont = canvObj.getContext("2d")
+    this.#canv.height = this.#canv.width *
+      (this.#canv.clientHeight / this.#canv.clientWidth);
     this.#cont.beginPath()
     this.#cont.clearRect(0, 0, this.#canv.width, this.#canv.height);
   }
@@ -578,6 +580,9 @@ class ExecutionInterface {
     this.bind_builtin_words()
     this.on_code_change()
     show_input()
+    this.#buttonNext.disabled = true
+    this.#buttonStop.disabled = true
+    this.#buttonRun.disabled = true
   }
 
   bind_builtin_words () {
@@ -795,6 +800,7 @@ class ExecutionInterface {
       this.#buttonStart.disabled = true
       this.#buttonNext.disabled = false
       this.#buttonStop.disabled = false
+      this.#buttonRun.disabled = false
 
       this.#steps = 0
 
@@ -827,6 +833,9 @@ class ExecutionInterface {
   on_next () {
     console.log("Next clicked")
     try {
+      if (!this.#interpretor.working) {
+        return
+      }
 
       this.unhighlight()
 
@@ -862,6 +871,8 @@ class ExecutionInterface {
     this.#buttonStop.disabled = true
     this.#buttonStart.disabled = true
 
+    this.#interpretor.working = false
+
     this.init()
   }
 
@@ -881,9 +892,10 @@ class ExecutionInterface {
 
   on_tick() {
     for (let step = 0; step < 20; step++) {
-      // FIX:Error when on_stop clicked while tick running
       this.on_next()
-      if (!this.#interpretor.working) { return }
+      if (!this.#interpretor.working) {
+        return
+      }
     }
     setTimeout(() => { this.on_tick() } , 0);
   }
@@ -900,7 +912,7 @@ const EI = new ExecutionInterface(
   document.querySelector('#right_stack'),
   document.querySelector('#dictionary'),
   document.querySelector('.words'),
-  document.querySelector('.output'),
+  document.querySelector('.output_text'),
   document.querySelector('#canv'),
   document.querySelector('.input'),
 )
