@@ -24,6 +24,7 @@
   /* justify-content: center; */
   /* display: flex; */
   scrollbar-color: var(--highlight-c2) var(--highlight-c);
+  scrollbar-width: thin;
 }
 
 .stack_panel {
@@ -34,7 +35,7 @@
   color: var(--text-c);
   overflow: scroll;
   scrollbar-color: var(--highlight-c2) var(--highlight-c);
-
+  scrollbar-width: thin;
 }
 
 .output {
@@ -50,11 +51,13 @@
   white-space: pre;
   overflow: scroll;
   scrollbar-color: var(--highlight-c2) var(--highlight-c);
+  scrollbar-width: thin;
 }
 
 #canv {
   height: 50%;
   width: 100%;
+  image-rendering: pixelated;
 }
 
 body {
@@ -106,6 +109,7 @@ footer {
   margin: 0;
   white-space: pre;
   scrollbar-color: var(--highlight-c2);
+  scrollbar-width: thin;
 }
 
 .words {
@@ -120,9 +124,17 @@ footer {
 }
 
 .highlighted_border {
-  border: solid var(--text-c) 2px;
+  outline: solid var(--text-c) 2px;
 }
 
 .steps {
   margin-right: 5px;
+}
+
+textarea {
+  padding: 0;
+}
+
+table {
+  border-collapse: collapse;
 }

@@ -85,10 +85,9 @@ class StackExplorer {
 
   push(value) {
     this.#stack.unshift(value)
-    const span = document.createElement('span')
-    const span2 = document.createElement('span')
-    const span3 = document.createElement('span')
-    const br = document.createElement('br')
+    const span = document.createElement('tr')
+    const span2 = document.createElement('td')
+    const span3 = document.createElement('td')
     span.setAttribute('class', "highlighted")
     this.#stackObj.prepend(span)
     this.#stackArr.unshift(span)
@@ -96,9 +95,8 @@ class StackExplorer {
     const t = document.createTextNode(value)
     span3.appendChild(t)
     span.appendChild(span2)
-    span2.setAttribute('style','padding: 5px;')
+    span3.setAttribute('style','padding-left: 0.5rem;')
     span.appendChild(span3)
-    span.appendChild(br)
     this.fix_numbs()
 
     span.addEventListener("mouseenter", (event) => {
@@ -163,8 +161,10 @@ class Dictinary {
     const br = document.createElement('br')
 
     span.appendChild(spanWord)
+    spanWord.setAttribute('style',"padding-right: 0.5rem; font-weight: bold;")
     spanWord.appendChild(tWord)
     span.appendChild(spanDef)
+    spanDef.setAttribute('style',"padding-right: 0.5rem;")
     spanDef.appendChild(tDef)
     span.appendChild(spanComment)
     if (comment) {
@@ -172,6 +172,14 @@ class Dictinary {
     }
     span.appendChild(br)
     this.fixlight(true)
+
+    span.addEventListener("mouseenter", (event) => {
+      this.#callback(definition)
+    })
+
+    span.addEventListener("mouseleave", (event) => {
+      this.#callback(null)
+    })
   }
 
   fixlight(should) {
@@ -214,6 +222,7 @@ class Dictinary {
     this.fixlight(false)
   }
 
+  
 
 }
 
@@ -221,15 +230,19 @@ class Dictinary {
 const show_input = () => {
   const input = document.querySelector('.input')
   const words = document.querySelector('.words')
+  const code = document.querySelector('.code_panel')
   input.setAttribute("style", "visibility: visible")
   words.setAttribute("style", "visibility: collapse;")
+  code.setAttribute("style", "overflow: hidden;")
 }
 
 const show_words = () => {
   const input = document.querySelector('.input')
   const words = document.querySelector('.words')
+  const code = document.querySelector('.code_panel')
   input.setAttribute("style", "visibility: collapse;")
   words.setAttribute("style", "visibility: visible;")
+  code.setAttribute("style", "overflow: scroll;")
 }
 
 class ShowWords {
