@@ -5,11 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Forth</title>
     <link href="styles.css" rel="stylesheet">
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    
   </head>
   <body>
     <header>
+      <div class ="flex">
+      <div class = "counters">
+        <label>S: </label>
+        <label for="" id = "steps"></label>
+      </div>
 
+      <div class = "counters">
+        <label >W: </label>
+        <label for="" id="wordsL"></label>
+      </div>
+      </div>
     </header>
     <main>
       <div class = "code_panel">
@@ -63,8 +73,6 @@
       <button type="" class = "stop">Stop</button>
       <button type="" class = "next_step">Next step</button>
       <button type="" id = "run">Run</button>
-      <label for="" class = "steps"></label>
-      <label for="" class = "wordsL"></label>
     </footer>
   <script src='./script.js'></script>
   </body>
