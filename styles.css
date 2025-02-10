@@ -100,6 +100,7 @@ footer {
 .input {
   position: absolute;
   color: var(--text-c);
+  background-color: var(--background-c);
   font-size: 20px;
   font-weight: 700;
   font-family: monospace;
