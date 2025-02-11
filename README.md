@@ -1,4 +1,4 @@
-# web-forth
+# Web-FORTH
 https://toastedandbored.github.io/web-forth/
 
 ## Project 
