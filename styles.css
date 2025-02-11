@@ -169,11 +169,11 @@ button:disabled {
 }
 
 .next {
-  visibility: collapse;
+  display: none;
 }
 
 .prev {
-  visibility: collapse;
+  display: none;
 }
 
 footer {
