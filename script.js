@@ -915,15 +915,60 @@ class ExecutionInterface {
   }
 
   on_tick() {
-    for (let step = 0; step < 20; step++) {
+    for (let step = 0; step < 10; step++) {
       this.on_next()
       if (!this.#interpretor.working) {
         return
       }
     }
     setTimeout(() => { this.on_tick() } , 0);
+    this.#buttonRun.disabled = true
   }
 }
+
+let panelCounter = 2
+
+const updatePanelsVisibility = () => {
+
+  const code = document.querySelector('.code_panel')
+  const stack = document.querySelector('.stack_panel')
+  const output = document.querySelector('.output')
+
+  const current = Math.abs(panelCounter%3)
+
+  if (current === 0) {
+    code.classList.remove('panel')
+  } else {
+    code.classList.add('panel')
+  }
+  if (current === 1) {
+    stack.classList.remove('panel')
+  } else {
+    stack.classList.add('panel')
+  }
+  if (current === 2) {
+    output.classList.remove('panel')
+  } else {
+    output.classList.add('panel')
+  }
+}
+
+const prev = () => {
+  panelCounter -= 1
+  updatePanelsVisibility()
+}
+const next = () => {
+  panelCounter += 1
+  updatePanelsVisibility()
+}
+
+document.querySelector('.next').addEventListener('click', (event) => {
+  next()
+})
+
+document.querySelector('.prev').addEventListener('click', (event) => {
+  prev()
+})
 
 const EI = new ExecutionInterface(
   document.querySelector('.start'),

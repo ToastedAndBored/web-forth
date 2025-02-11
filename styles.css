@@ -167,3 +167,43 @@ button:disabled {
   display: flex;
   justify-content: space-between;
 }
+
+.next {
+  visibility: collapse;
+}
+
+.prev {
+  visibility: collapse;
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+}
+
+@media screen and (max-width: 900px) {
+
+  .panel {
+    visibility: collapse;
+  }
+
+  .code_panel {
+    width: 100vw;
+  }
+
+  .stack_panel {
+    width: 100vw;
+  }
+
+  .output {
+    width: 100vw;
+  }
+
+  .next {
+    visibility: visible;
+  }
+
+  .prev {
+    visibility: visible;
+  }
+}
