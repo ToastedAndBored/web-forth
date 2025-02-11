@@ -76,6 +76,7 @@ class StackExplorer {
   #stack = []
   #callback = () => {}
   #stackObj
+  #handlers = []
 
 
   constructor(stackObj,callback) {
@@ -99,19 +100,29 @@ class StackExplorer {
     span.appendChild(span3)
     this.fix_numbs()
 
-    span.addEventListener("mouseenter", (event) => {
+    const handlerEnter = (event) => {
       this.#callback(value)
-    })
+    }
 
-    span.addEventListener("mouseleave", (event) => {
+    const handlerLeave = (event) => {
       this.#callback(null)
-    })
+    }
+
+    span.addEventListener("mouseenter", handlerEnter)
+
+    span.addEventListener("mouseleave", handlerLeave)
+
+    this.#handlers.unshift({'enter': handlerEnter, "leave": handlerLeave})
+
   }
 
   pop() {
     const value = this.#stack.shift()
+    this.#stackObj.children[0].removeEventListener('mouseenter', this.#handlers[0].enter)
+    this.#stackObj.children[0].removeEventListener('mouseleave', this.#handlers[0].leave)
     this.#stackObj.children[0].remove()
     this.#stackArr.shift()
+    this.#handlers.shift()
     this.fix_numbs()
     return value
   }
