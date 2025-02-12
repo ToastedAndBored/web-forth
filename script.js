@@ -294,13 +294,13 @@ class ShowWords {
 
   highlight_border(index) {
     if (this.#highlightedBorder !== null) {
-      this.#highlightedBorder.classList.remove('highlighted_border')
+      this.#highlightedBorder?.classList?.remove('highlighted_border')
     }
     if (index == null) {return}
     if (typeof index != "number") {return}
     if (index < 0) {return}
     if (index >= this.#text.length) {return}
-    this.#text[index].classList.add('highlighted_border')
+    this.#text[index]?.classList?.add('highlighted_border')
     this.#highlightedBorder = this.#text[index]
   }
 

@@ -18,8 +18,8 @@
 
 .code_panel {
   /* display: inline-block; */
-  height: 85vh;
-  width : 33vw;
+  height: 83dvh;
+  width : 33dvw;
   border: solid var(--border-c)4px;
   border-right: solid var(--border-c)5px;
   color: var(--text-c);
@@ -35,8 +35,8 @@
 
 .stack_panel {
   /* display: inline-block; */
-  height: 85vh;
-  width : 33vw;
+  height: 83dvh;
+  width : 33dvw;
   border: solid var(--border-c) 4px;
   color: var(--text-c);
   overflow: scroll;
@@ -46,8 +46,8 @@
 
 .output {
   /* display: inline-block; */
-  height: 85vh;
-  width : 33vw;
+  height: 83dvh;
+  width : 33dvw;
   border: solid var(--border-c) 4px;
   color: var(--text-c);
 }
