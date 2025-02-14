@@ -1,76 +1,95 @@
 # Web-FORTH
-https://toastedandbored.github.io/web-forth/
+Visual [web-interpreter](https://toastedandbored.github.io/web-forth/) of [FORTH](https://en.wikipedia.org/wiki/Forth_(programming_language)) language (sort of) with [brainfuck](https://en.wikipedia.org/wiki/Brainfuck) flavour.
 
-## Project 
-Web-interpreter of FORTH language with visualization of the work process.
+## Code examples
+### Fibonacci
+```
+: [ .. '\n' .. ; .n @
+:
+  ][ -> [ <- + .n
+  [ 17711 = !
+  'fib' ~
+  , <- 9 + <- ][ -> -> ?
+; fib @
 
-## Developed
-A page divided vertically into three panels of equal width:
-- The panel with the source code
-- The panel displaying two interpreter stacks and dictionary
-- A panel displaying the program output in text and drawing on canvas
+0 .n 1 [ [ [ [ .n .n fib
+```
 
-There are four buttons below the panels in desctop and two extra in mobile mode
-- Start
-- Stop
-- Take one step
-- Run program
-- Next panel
-- Prev panel
+### Factorial
+```
+: [ .. '\n' .. ; .n @
+:
+  [ -> -> .n <- * <- 1 +
+  [ 22 = !
+  'fact' ~
+  , <- 9 + <- ][ -> -> ?
+; fact @
+1 [ fact
+```
 
-Also site has labels that show:
-- Steps
-- Words in program
+### Random shuffle
+```
+: -> ][ <- ][ ; up3 @
+:
+  up3
+  3 0 <> 1 ][ // 0 =
+  'shuffle3' ~
+  ! , <- 9 + <- ][ -> -> ?
+; shuffle3 @
+a b c
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+shuffle3 [ ..
+```
 
-The user can enter any FORTH code in the left panel and run it for execution.
-During the interpretation process, the word that being executed on the left panel is highlighted in color.
+### Sierpinski triangle
+[Chaos game](https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle#Chaos_game) algorithm
+```
+:
+ -> ][ <-
+ + 2 ][ / ->
+ + 2 ][ / <-
+; |> @
+: [ -> -> [ <- ][ <- ; [2 @
+:
+  -> -> -> ][ -> ][ <-
+  <- ][ -> ][ <-
+  <- ][ -> ][ <-
+  <- ][ -> ][ <-
+; 2-3> @
+:
+ 2-3>
+ 3 0 <> 1 ][ // 0 =
+ '<3>' ~
+ ! , <- 9 + <- ][ -> -> ?
+; <3> @
 
-The center panel displays the contents of the data stack one after another,
-the interpreter call stack and the dictionary of words declared by the program.
-When you move the cursor over a value in the call stack, the word on the 
-left panel is boxed (if word existes).
-The same is true for word definitions in the dictionary.
-Overridden words in the dictionary are displayed semi-transparent.
+0 0 [2 (>) 10 (.)
+(w) 0 [2 (>) 10 (.)
+2 (w) / (h) [2 (>) 10 (.)
 
-The right panel contains the text output by the executable program and it contains a canvas
-on which the executable code is able to draw.
-
-### Mobile ready UI
-On narrow vertical screens of smartphones, the page is not divided into three vertical panels, but displays one panel, the mode of which can be changed with the Next and Prev buttons.
-
-## Video demonstrations
-
-
-
-## FORTH
-This project uses one of the FORTH language variations
-(different from the original FORTH).
+, <3> [2 (^) |> (>) 3 (.) ^
+```
 
 ## Syntax
 - A text in FORTH consists of words.
-- Words are separated by non-significant characters:
-	- Space
-	- Tab character (`\t`)
-	- New line character (`\n`)
-	- Carriage return character (`\r`)
+- Words are separated by whitespace characters:
+	- Space itself (` `)
+	- Tab (`\t`)
+	- New line (`\n`)
+	- Carriage return (`\r`)
 - Single quotation marks `'` combine several words into one word
-	- Such words are called `quoted words'.
+	- Such words are called `quoted words`.
 	- Within such words, some substrings are substituted.
 		- `\\\\` to `\`
-		- `\'` to ```
+		- `\'` to `'`
 		- `\n` to a line break character.
-	- In this case, the quotation marks framing the word are deleted.
 - Words consisting only of digits are numbers.
 	- except for `quotted' words, which are always strings.
-
-Thus the following text on FORTH:
-```forth
-  : a b c ; d e
-f g 'a \n \n bb'
-hijk l
-
-
-m       n    145
-```
-
 
